@@ -48,14 +48,18 @@
             <thead>
                 <tr>
                     <th>Stofnun</th>
+                    <th>Deild</th>
                     <th>Fjöldi</th>
+                    <th>Dags talningar</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in data %}
+                {% for label, (count, date, institution) in highest_counts.items() %}
                 <tr>
-                    <td>{{ item['name'] }}</td>
-                    <td>{{ item['count'] }}</td>
+                    <td>{{ institution }}</td>
+                    <td>{{ label }}</td>
+                    <td>{{ count }}</td>
+                    <td>{{ date }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

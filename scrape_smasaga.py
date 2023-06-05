@@ -1,20 +1,3 @@
-import importlib
-
-# List of dependencies to check and install if needed
-# dependencies = ['requests', 'beautifulsoup4']
-
-# Check if each dependency is already installed
-# for dependency in dependencies:
-#     try:
-#         importlib.import_module(dependency)
-#     except ImportError:
-#         # Install the dependency
-#         import subprocess
-#         import sys
-        
-#         subprocess.check_call([sys.executable, '-m', 'pip', 'install', dependency])
-#         importlib.import_module(dependency)
-
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, render_template
@@ -30,50 +13,56 @@ def index():
         ,'https://smasaga.hsa.is/MobileServices/api/ping'
         ,'https://smasaga.hvest.is/MobileServices/api/ping'
         ,'https://smasaga.hg.is/MobileServices/api/ping'
+        ,'https://smasaga.hsn.is/MobileServices/api/ping'
+        # ,'https://sagaapp.lsh.is/MobileServices/api/ping'
+        ,'https://hve-smasaga.hve.is/MobileServices/api/ping'
+        ,'https://smasaga.hvest.is/MobileServices/api/ping'
         ,
             ]
 
-    data = [
-        # {'url': 'https://smasaga.hsu.is/MobileServices/api/ping', 'count': 0},
-        # {'url': 'https://smasaga.hss.is/MobileServices/api/ping', 'count': 0},
-        # {'url': 'https://smasaga.hsa.is/MobileServices/api/ping', 'count': 0},
-        # {'url': 'https://smasaga.hvest.is/MobileServices/api/ping', 'count': 0},
-        # {'url': 'https://smasaga.hg.is/MobileServices/api/ping', 'count': 0}
-    ]
-
     # Send a GET request to the webpage
+    highest_counts = {}
     for url in urls:
         response = requests.get(url)
 
-        # Create a BeautifulSoup object to parse the HTML content
+        # Parse the HTML content using BeautifulSoup
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Find the table on the page
-        table = soup.find_all('table')
+        # Find the second table on the page
+        tables = soup.find_all('table')
+        if len(tables) < 2:
+            print("No second table found.")
+            exit(1)
 
-        # Find all rows in the table
-        rows = table[1].find_all('tr')
+        table = tables[1]
 
-        # Get the values from the rightmost column in each row and add them together
-        total = 0
-        for row in rows:
-            # Find the rightmost cell in the row
+        # Initialize a dictionary to store the highest count for each label
+
+        # Iterate over the rows in the table
+        for row in table.find_all('tr'):
+            # Extract the cells from the row
             cells = row.find_all('td')
-            if len(cells) > 0:
-                rightmost_cell = cells[-1].text.strip()  # Adjust the index if needed
+            if len(cells) < 3:
+                continue
 
-                # Check if the rightmost cell is not null
-                if rightmost_cell:
-                    # Convert the value to an integer and add it to the total
-                    total += int(rightmost_cell) if rightmost_cell.isdigit() else 0
+            # Extract the date, label, and counter from the cells
+            date = cells[0].text.strip()
+            label = cells[1].text.strip()
+            institution = url.split('.')[1].upper()
+            # label = institution + ' - ' + label if label != '' else label
+            counter = int(cells[2].text.strip()) if cells[2].text.strip().isdigit() else 0
 
-        # Add a label to the total
-        label = url.split('.')[1].upper()
-        data.append({'name': label, 'count': total})
+            # Update the highest count, date, and label if necessary
+            if label != '':
+                if label in highest_counts:
+                    if counter > highest_counts[label][0]:
+                        highest_counts[label] = (counter, date, institution)
+                else:
+                    highest_counts[label] = (counter, date, institution)
 
         # Print the result
         # print(f'{label}: {total}')
-    return render_template('index.html', data=data)
+    return render_template('index.html', highest_counts=highest_counts)
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5000)
