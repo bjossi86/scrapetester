@@ -38,7 +38,37 @@
         .table td {
             color: #333;
         }
+         
+        .detail-row {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .detail-row.show {
+            display: table-row;
+            opacity: 1;
+        }
     </style>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Get all the rows in the table
+            const rows = document.querySelectorAll('table tbody tr');
+
+            // Attach click event listener to each row
+            rows.forEach((row) => {
+                row.addEventListener('click', () => {
+                    console.log('clicked')
+                    // Toggle the display of detail rows below the clicked row
+                    const detailRow = row.nextElementSibling;
+                    // detailRows.forEach((detailRow) => {
+                        detailRow.classList.toggle('show');
+                        // detailRow.style.display = (detailRow.style.display !== 'table-row') ? 'table-row' : 'none';
+                    // });
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <h1 style="text-align: center;">Smásögu notendur á stofnun</h1>
@@ -54,12 +84,16 @@
                 </tr>
             </thead>
             <tbody>
-                {% for label, (count, date, institution) in highest_counts.items() %}
+                {% for label, (count, date, institution, total) in highest_counts.items() %}
                 <tr>
                     <td>{{ institution }}</td>
                     <td>{{ label }}</td>
                     <td>{{ count }}</td>
                     <td>{{ date }}</td>
+                    <td>{{ total }}</td>
+                </tr>
+                <tr class="detail-row">
+                    <td colspan="3">Additional details for {{ label }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: scrapetester
+  name: smasaga-user-count
   namespace: argocd
 spec:
   project: default

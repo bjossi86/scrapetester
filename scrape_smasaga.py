@@ -9,19 +9,21 @@ def index():
     # Define the URL of the webpage you want to scrape
     urls = [
         'https://smasaga.hsu.is/MobileServices/api/ping' 
-        ,'https://smasaga.hss.is/MobileServices/api/ping'
-        ,'https://smasaga.hsa.is/MobileServices/api/ping'
-        ,'https://smasaga.hvest.is/MobileServices/api/ping'
-        ,'https://smasaga.hg.is/MobileServices/api/ping'
-        ,'https://smasaga.hsn.is/MobileServices/api/ping'
-        # ,'https://sagaapp.lsh.is/MobileServices/api/ping'
-        ,'https://hve-smasaga.hve.is/MobileServices/api/ping'
-        ,'https://smasaga.hvest.is/MobileServices/api/ping'
+        # ,'https://smasaga.hss.is/MobileServices/api/ping'
+        # ,'https://smasaga.hsa.is/MobileServices/api/ping'
+        # ,'https://smasaga.hvest.is/MobileServices/api/ping'
+        # ,'https://smasaga.hg.is/MobileServices/api/ping'
+        # ,'https://smasaga.hsn.is/MobileServices/api/ping'
+        # # ,'https://sagaapp.lsh.is/MobileServices/api/ping'
+        # ,'https://hve-smasaga.hve.is/MobileServices/api/ping'
+        # ,'https://smasaga.hvest.is/MobileServices/api/ping'
         ,
             ]
 
     # Send a GET request to the webpage
     highest_counts = {}
+    total = 0
+
     for url in urls:
         response = requests.get(url)
 
@@ -55,10 +57,11 @@ def index():
             # Update the highest count, date, and label if necessary
             if label != '':
                 if label in highest_counts:
+                    total += counter
                     if counter > highest_counts[label][0]:
-                        highest_counts[label] = (counter, date, institution)
+                        highest_counts[label] = (counter, date, institution, total)
                 else:
-                    highest_counts[label] = (counter, date, institution)
+                    highest_counts[label] = (counter, date, institution, total)
 
         # Print the result
         # print(f'{label}: {total}')
